@@ -1,0 +1,33 @@
+; emit char
+(m0.)
+
+; print string
+(p[#@ff&:#@ff&>m1+]~)
+
+; hello world string literal
+(h"Hello, world!"000a,)
+
+'h>p*
+
+; divide
+(v0!0/2!
+ [0@-#8000&=:2@1+2!]
+ 0@+2@)
+
+80/2>v>m~*
+80/1%>m*
+a>m*
+
+; print hex digit
+(xf&#b-8000&[:\0+)]\a+a-)
+(h>x>m)
+
+11>h2>h3>ha>m*
+
+; print hex number
+(n#12%>h#8%>h#4%>h>h)
+
+123>na>m*
+
+d7/3>v>n20>m>na>m*
+
