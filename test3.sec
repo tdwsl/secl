@@ -1,0 +1,28 @@
+; 99 bottles of beer
+
+(m0.)
+
+(p[#@ff&#:m1+]~~)
+
+; divide
+(v0!0/2!
+ [0@-#8000&=:2@1+2!]
+ 0@+2@)
+
+; print number
+(x\0+m)
+(nav#[:x0/0]~x)
+
+(a" bottle"0,
+(b" of beer"0,
+(c"no"0,
+(x'ap1-[:\sm0]'bp)
+(B#[:#nx)]'cpx)
+
+(a" on the wall"a,
+(b"take one down, pass it around"a,
+(n63
+ [#B'ap#Bam'bp1-#B'apam#:]~)
+
+n*
+
