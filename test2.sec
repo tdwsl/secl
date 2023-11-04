@@ -1,0 +1,14 @@
+
+(p[#@ff&#:0.1+]~~)
+
+; read to buffer
+(r2!0!
+ [1.#a-=[:~0/2@!)]0@#1+0!!2@1-#2!:]
+ 0/2@!)
+
+(a"Hello, what is your name?"a,
+(b"Nice to meet you, "0,
+(h'a>p?#30+$#30>r
+ 'b>p#>p$\.0.a/0.)
+
+>h*

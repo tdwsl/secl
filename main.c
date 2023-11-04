@@ -19,6 +19,9 @@ void intfun(SECL_W i) {
     case 0:
         fputc(secl_stack[--secl_sp], stdout);
         break;
+    case 1:
+        secl_stack[secl_sp++] = fgetc(stdin);
+        break;
     }
 }
 

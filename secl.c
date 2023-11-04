@@ -1,14 +1,14 @@
 #include "secl.h"
 #include <stdio.h>
 
-#define SECL_LIT 0
+#define SECL_LIT '_'
 
 SECL_W secl_stack[256];
 SECL_B secl_sp=0;
 SECL_W secl_rsp=0x16;
 SECL_W secl_funs[256];
 SECL_B secl_memory[SECL_MEMORYSZ];
-SECL_W secl_here=512, secl_old=512;
+SECL_W secl_here=4096, secl_old=4096;
 SECL_B secl_fun=0;
 SECL_W secl_br[256];
 SECL_B secl_brp=0;
@@ -75,8 +75,11 @@ void secl_mrun(SECL_W pc) {
         case ']':
             secl_pc = *(SECL_W*)&secl_memory[secl_pc];
             break;
+        case '?':
+            secl_stack[secl_sp++] = secl_rsp;
+            break;
         case '$':
-            secl_stack[secl_sp++] = secl_sp;
+            secl_rsp = secl_stack[--secl_sp];
             break;
         case '+':
             secl_stack[secl_sp-2] += secl_stack[secl_sp-1];
