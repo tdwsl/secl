@@ -2,32 +2,32 @@
 (m0.)
 
 ; print string
-(p[#@ff&:#@ff&>m1+]~)
+(p[#@ff&:#@ff&m1+]~)
 
 ; hello world string literal
 (h"Hello, world!"000a,)
 
-'h>p*
+'hp*
 
 ; divide
 (v0!0/2!
  [0@-#8000&=:2@1+2!]
  0@+2@)
 
-80/2>v>m~*
-80/1%>m*
-a>m*
+80/2vm~*
+80/1>m*
+am*
 
 ; print hex digit
 (xf&#b-8000&[:\0+)]\a+a-)
-(h>x>m)
+(hxm)
 
-11>h2>h3>ha>m*
+11h2h3ham*
 
 ; print hex number
-(n#12%>h#8%>h#4%>h>h)
+(n#12>h#8>h#4>hh)
 
-123>na>m*
+123nam*
 
-d7/3>v>n20>m>na>m*
+d7/3vn20mnam*
 

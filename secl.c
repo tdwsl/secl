@@ -1,7 +1,9 @@
 #include "secl.h"
 #include <stdio.h>
+#include <string.h>
 
 #define SECL_LIT '_'
+#define SECL_JSR 0
 
 SECL_W secl_stack[256];
 SECL_B secl_sp=0;
@@ -9,10 +11,11 @@ SECL_W secl_rsp=0x16;
 SECL_W secl_funs[256];
 SECL_B secl_memory[SECL_MEMORYSZ];
 SECL_W secl_here=4096, secl_old=4096;
-SECL_B secl_fun=0;
+SECL_W secl_while;
+SECL_W secl_pc;
 SECL_W secl_br[256];
 SECL_B secl_brp=0;
-SECL_W secl_pc;
+const char *secl_other = "+-&|^=<>#~?$!@_.";
 
 void (*secl_int)(SECL_W);
 
@@ -58,7 +61,7 @@ void secl_mrun(SECL_W pc) {
             secl_stack[secl_sp++] = *(SECL_W*)&secl_memory[secl_pc];
             secl_pc += 2;
             break;
-        case '>':
+        case SECL_JSR:
             *(SECL_W*)&secl_memory[0x100+secl_rsp] = secl_pc+2;
             secl_rsp += 2;
             secl_pc = *(SECL_W*)&secl_memory[secl_pc];
@@ -105,7 +108,7 @@ void secl_mrun(SECL_W pc) {
             secl_stack[secl_sp-2] <<= secl_stack[secl_sp-1];
             secl_sp--;
             break;
-        case '%':
+        case '>':
             secl_stack[secl_sp-2] >>= secl_stack[secl_sp-1];
             secl_sp--;
             break;
@@ -142,11 +145,9 @@ void secl_run(char *s) {
         switch(*(s++)) {
         case '(':
             secl_here--;
-            secl_fun=*(s++);
-            secl_funs[secl_fun] = secl_here;
+            secl_funs[*(s++)] = secl_here;
             break;
         case ')':
-            secl_fun = 0;
             secl_old = secl_here;
             break;
         case '*':
@@ -155,40 +156,25 @@ void secl_run(char *s) {
             break;
         case '[':
             secl_br[secl_brp++] = --secl_here;
-            secl_br[secl_brp++] = 0;
             break;
         case ':':
-            secl_br[secl_brp++] = secl_here;
+            secl_while = secl_here;
             secl_here += 2;
             break;
         case ']':
+            *(SECL_W*)&secl_memory[secl_here] = secl_br[--secl_brp];
             secl_here += 2;
-            for(secl_brp--; secl_br[secl_brp]; secl_brp--)
-                *(SECL_W*)&secl_memory[secl_br[secl_brp]] = secl_here;
-            *(SECL_W*)&secl_memory[secl_here-2] = secl_br[--secl_brp];
-            break;
-        case '>':
-            if(secl_funs[*s]) {
-                *(SECL_W*)&secl_memory[secl_here] = secl_funs[*s];
-                secl_here += 2;
-            } else secl_here--;
-            s++;
+            *(SECL_W*)&secl_memory[secl_while] = secl_here;
             break;
         case '\'':
-            if(secl_funs[*s]) {
-                secl_memory[secl_here-1] = SECL_LIT;
-                *(SECL_W*)&secl_memory[secl_here] = secl_funs[*s];
-                secl_here += 2;
-            } else secl_here--;
-            s++;
+            secl_memory[secl_here-1] = SECL_LIT;
+            *(SECL_W*)&secl_memory[secl_here] = secl_funs[*(s++)];
+            secl_here += 2;
             break;
         case '\\':
             secl_memory[secl_here-1] = SECL_LIT;
             *(SECL_W*)&secl_memory[secl_here] = *(s++);
             secl_here += 2;
-            break;
-        case '/':
-            secl_here--;
             break;
         case '"':
             secl_here--;
@@ -208,7 +194,13 @@ void secl_run(char *s) {
             if((*(s-1) >= '0' && *(s-1) <= '9')
             || (*(s-1) >= 'a' && *(s-1) <= 'f'))
                 s = secl_addnum(s-1);
-            else if(*(s-1) <= ' ') secl_here--;
+            else if(!strchr(secl_other, *(s-1))) {
+                if(secl_funs[*(s-1)]) {
+                    secl_memory[secl_here-1] = SECL_JSR;
+                    *(SECL_W*)&secl_memory[secl_here] = secl_funs[*(s-1)];
+                    secl_here += 2;
+                } else secl_here--;
+            }
             break;
         }
     }
